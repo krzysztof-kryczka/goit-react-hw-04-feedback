@@ -1,54 +1,48 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Section from './Section/Section';
 import Statistics from './Statistics/Statistics';
 import FeedbackOptions from './FeedbackOptions/FeedbackOptions';
 import Notification from './Notification/Notification';
 
-export class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
+export const App = () => {
 
-  leaveFeedback = e => {
+  const [state, setState] = useState({good: 0, neutral: 0, bad: 0})
+
+  const leaveFeedback = e => {
     const { name } = e.target;
-    this.setState(state => ({ [name]: state[name] + 1 }));
+    
+    setState(state => ({ 
+      ...state,
+      [name]: state[name] + 1 }));
   };
 
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
-    return good + neutral + bad;
+  const countTotalFeedback = () => {
+    return state.good + state.neutral + state.bad;
   };
 
-  countPositiveFeedbackPercentage = () => {
-    return Math.round((this.state.good / this.countTotalFeedback()) * 100 || 0);
+  const countPositiveFeedbackPercentage = () => {
+    return Math.round((state.good / countTotalFeedback()) * 100 || 0);
   };
 
-  render() {
-    const { good, neutral, bad } = this.state;
-    const total = this.countTotalFeedback();
-    const positivePercentage = this.countPositiveFeedbackPercentage();
     return (
       <>
         <Section title="Please leave feedback">
           <FeedbackOptions
-            options={Object.keys(this.state)}
-            onLeaveFeedback={this.leaveFeedback}
+            options={Object.keys(state)}
+            onLeaveFeedback={leaveFeedback}
           />
-          {total === 0 ? (
+          {countTotalFeedback() === 0 ? (
             <Notification message="There is no feedback"></Notification>
           ) : (
             <Statistics
-              good={good}
-              neutral={neutral}
-              bad={bad}
-              total={total}
-              positivePercentage={positivePercentage}
+              good={state.good}
+              neutral={state.neutral}
+              bad={state.bad}
+              total={countTotalFeedback()}
+              positivePercentage={countPositiveFeedbackPercentage()}
             />
           )}
         </Section>
       </>
     );
   }
-}
